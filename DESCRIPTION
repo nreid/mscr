@@ -1,10 +1,16 @@
 Package: mscr
 Type: Package
-Title: What the Package Does (Title Case)
+Title: a bunch of random things
 Version: 0.1
 Date: 2015-09-21
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Noah Reid
+Maintainer: Noah Reid <noah.reid@gmail.com>
+Description: a bunch of random things
+License: What license is it under? uh none?
 LazyData: TRUE
+Imports:
+	magrittr,
+	dplyr,
+	hierfstat,
+	NMF,
+	edgeR
