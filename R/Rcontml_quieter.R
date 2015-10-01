@@ -1,14 +1,14 @@
 #this function (and the relevant helper function) are taken from package Rphylip by Liam J. Revell and Scott A. Chamberlain
 #I modified it to be quieter. It requires a helper function that isn't exported, and so can't be seen by this function, so I included it. 
 
-#I also modified it so that it uses uniquely named temporary files, so that multiple instances run in the same directory do not interfere with one another. 
+#I also modified it so that it uses a uniquely named temporary file directory, so that multiple instances launched in the same directory do not interfere with one another.
 
 Rcontml_quieter <- function (X, path = NULL, ...) 
 {
-    infile <- tempfile("infile",tmpdir=".")
-    outfile <- tempfile("outfile",tmpdir=".")
-    outtree <- tempfile("outtree",tmpdir=".")
-    intree <- tempfile("intree",tmpdir=".")
+
+    pardir<-getwd()
+    tmp<-tempdir()
+    setwd(tmp)
 
     if (is.null(path)) 
         path <- findPath("contml")
@@ -18,18 +18,18 @@ Rcontml_quieter <- function (X, path = NULL, ...)
         quiet <- list(...)$quiet
     else quiet <- FALSE
     if (!quiet) 
-        if (file.warn(c(infile, outfile, outtree)) == 0) 
+        if (file.warn(c("infile", "outfile", "outtree")) == 0) 
             return(NULL)
     oo <- c("r")
     if (is.matrix(X)) {
         write(paste("    ", nrow(X), "   ", ncol(X), sep = ""), 
-            file = infile)
+            file = "infile")
         for (i in 1:nrow(X)) {
             sp <- as.character(i)
             sp <- paste(sp, paste(rep(" ", 11 - nchar(sp)), collapse = ""), 
                 collapse = "")
             tt <- paste(sp, paste(X[i, ], collapse = " "), collapse = " ")
-            write(tt, append = TRUE, file = infile)
+            write(tt, append = TRUE, file = "infile")
         }
         oo <- c(oo, "c")
         if (hasArg(tree)) {
@@ -37,7 +37,7 @@ Rcontml_quieter <- function (X, path = NULL, ...)
             tree <- list(...)$tree
             tree$tip.label <- sapply(tree$tip.label, function(x, 
                 y) which(x == y), y = rownames(X))
-            write.tree(tree, intree)
+            write.tree(tree, "intree")
             intree <- TRUE
         }
         else intree <- FALSE
@@ -62,8 +62,8 @@ Rcontml_quieter <- function (X, path = NULL, ...)
         system("touch outfile")
         system(paste(path, "/contml", sep = ""), input = oo, 
             ignore.stdout = TRUE, ignore.stderr = TRUE)
-        tree <- read.tree(outtree)
-        temp <- readLines(outfile)
+        tree <- read.tree("outtree")
+        temp <- readLines("outfile")
         logLik <- as.numeric(strsplit(temp[grep("Ln Likelihood", 
             temp)], "=")[[1]][2])
         if (!quiet){
@@ -86,9 +86,9 @@ Rcontml_quieter <- function (X, path = NULL, ...)
         tips <- rownames(X[[1]])
         X <- lapply(X, function(x, tips) x[tips, ], tips = tips)
         write(paste("    ", nrow(X[[1]]), "   ", length(X), sep = ""), 
-            file = infile)
+            file = "infile")
         nalleles <- sapply(X, ncol)
-        write(paste(nalleles, collapse = " "), file = infile, 
+        write(paste(nalleles, collapse = " "), file = "infile", 
             append = TRUE)
         temp <- sapply(X, rowSums)
         if (!all(round(temp, 2) == 1)) 
@@ -100,7 +100,7 @@ Rcontml_quieter <- function (X, path = NULL, ...)
             dd <- vector()
             for (j in 1:length(X)) dd <- c(dd, X[[j]][i, ])
             tt <- paste(sp, paste(dd, collapse = " "), collapse = " ")
-            write(tt, append = TRUE, file = infile)
+            write(tt, append = TRUE, file = "infile")
         }
         oo <- c(oo, "a")
         if (hasArg(tree)) {
@@ -108,7 +108,7 @@ Rcontml_quieter <- function (X, path = NULL, ...)
             tree <- list(...)$tree
             tree$tip.label <- sapply(tree$tip.label, function(x, 
                 y) which(x == y), y = rownames(X))
-            write.tree(tree, intree)
+            write.tree(tree, "intree")
             intree <- TRUE
         }
         else intree <- FALSE
@@ -133,8 +133,8 @@ Rcontml_quieter <- function (X, path = NULL, ...)
         system("touch outfile")
         system(paste(path, "/contml", sep = ""), input = oo, 
             ignore.stdout = TRUE, ignore.stderr = TRUE)
-        tree <- read.tree(outtree)
-        temp <- readLines(outfile)
+        tree <- read.tree("outtree")
+        temp <- readLines("outfile")
         logLik <- as.numeric(strsplit(temp[grep("Ln Likelihood", 
             temp)], "=")[[1]][2])
         if (!quiet) {
@@ -162,12 +162,15 @@ Rcontml_quieter <- function (X, path = NULL, ...)
         cleanup <- list(...)$cleanup
     else cleanup <- TRUE
     if (cleanup) {
-        files <- c(infile, outfile, outtree)
+        files <- c("infile", "outfile", "outtree")
         if (intree) 
-            files <- c(files, intree)
+            files <- c(files, "intree")
         cleanFiles(files)
     }
     tree$logLik <- logLik
+
+    setwd(pardir)
+ 
     return(tree)
 }
 
