@@ -30,7 +30,7 @@ mergewin<-function(win, stat, qu, tails=TRUE, buff=5000){
 		
 		ind<-length(out[,1])
 		if(out[ind,1]==win[i,1]&(out[ind,3]+buff)>=win[i,2]){
-			out[ind,3]<-win[i,3]
+			out[ind,3]<-max(win[i,3],out[ind,3])
 			out[ind,4]<-out[ind,3]-out[ind,2]
 			out[ind,5]<-out[ind,5]+stat[i]
 			if(abs(out[ind,6])<abs(stat[i])){out[ind,6]<-stat[i]}
