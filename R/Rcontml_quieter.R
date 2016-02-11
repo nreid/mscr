@@ -182,3 +182,20 @@ cleanFiles<-function (fs)
             show.output.on.console = FALSE)
     else for (i in 1:length(fs)) system(paste("rm", fs[i], sep = " "))
 }
+
+file.warn <- function (gg) 
+{
+    ff <- list.files()
+    gg <- gg[sapply(gg, "%in%", ff)]
+    if (any(sapply(gg, "%in%", ff))) {
+        cat(paste("Warning:\n  One or more of", paste("\"", gg, 
+            "\"", sep = "", collapse = ", "), "\n  was found in your current working directory and may be overwritten\n"))
+        cat("\nPress ENTER to continue or q to quit: ")
+        q <- readLines(n = 1)
+        if (q == "q" || q == "Q") 
+            return(0)
+        else return(1)
+    }
+    else return(1)
+}
+
