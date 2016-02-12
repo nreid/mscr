@@ -1,0 +1,27 @@
+pulldiv <- function(scaf,stat="pi",win="5kb1kbwindow",popids=c("bi","bp","er","f","kc","nbh","nyc","sh")){
+	pops <- popids
+	#tabix sh.pi.5kb1kbwindow.test.gz Scaffold9893
+	div <- list()
+	for(i in 1:length(pops)){
+
+		fn <- paste(pops[i],stat,win,"test.gz",sep=".",collapse=".")
+		print(fn)
+		fn <- paste("~/popgen/variants/bowfree/angsd/",fn,sep="",collapse="")
+		print(fn)
+		cline <- paste("tabix ",fn,scaf,sep=" ",collapse=" ")
+		print(cline)
+		div[[i]] <- read.table(pipe(cline),stringsAsFactors=FALSE)
+		
+		}
+
+	out <- div[[1]][,2:3]
+	for(i in 1:length(pops)){
+
+		out <- cbind(out,div[[i]][,4])
+
+		}
+
+	colnames(out) <- c("start","end",pops)
+
+	return(out)
+	}
