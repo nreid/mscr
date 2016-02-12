@@ -14,14 +14,14 @@ pulldiv <- function(scaf,stat="pi",win="5kb1kbwindow",popids=c("bi","bp","er","f
 		
 		}
 
-	out <- div[[1]][,2:3]
+	out <- div[[1]][,c(2:3,6)]
 	for(i in 1:length(pops)){
 
 		out <- cbind(out,div[[i]][,4])
 
 		}
 
-	colnames(out) <- c("start","end",pops)
+	colnames(out) <- c("start","end","nsites",pops)
 
 	return(out)
 	}
