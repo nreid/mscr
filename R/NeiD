@@ -1,0 +1,16 @@
+NeiD <- function(x1,x2){
+	#Nei's D. x1 and x2 are vectors of allele frequencies. 
+	#pulled from a chapter by Nei in a book on fishery management. 
+	#http://nsgl.gso.uri.edu/washu/washub87001/washub87001_part6.pdf
+	
+	Jx <- mean((x1^2)+(1-x1)^2)
+	Jy <- mean((x2^2)+(1-x2)^2)
+	Jxy <- mean((x1*x2) + (1-x1)*(1-x2))
+
+	I <- Jxy/sqrt(Jx*Jy)
+
+	D <- -log(I)
+
+	return(D)
+	}
+
